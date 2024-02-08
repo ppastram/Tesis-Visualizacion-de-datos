@@ -1,0 +1,7 @@
+id,id_valor,tipoVivienda,tipoVivienda_valor,energiaElectrica,energiaElectrica_valor,estratoTarifa,estratoTarifa_valor,acueducto,acueducto_valor,alcantarillado,alcantarillado_valor,recoleccionBasuras,recoleccionBasuras_valor,diasSemana,diasSemana_valor,Internet,Internet_valor,gasNatural,gasNatural_valor,mes,mes_valor,dia,dia_valor,urbanoORural,urbanoORural_valor,region,region_valor,factorExpansion,factorExpansion_valor
+,,1,casa,1,si,,,1,si,1,si,1,si,,,1,si,1,si,,,,,1,urbano,1,caribe,,
+,,2,apartamento,2,no,,,2,no,2,no,2,no,,,2,no,2,no,,,,,2,rural,2,central,,
+,,3,cuarto,,,,,,,,,,,,,,,,,,,,,,,3,oriental,,
+,,4,vivienda tradicional indigena,,,,,,,,,,,,,,,,,,,,,,,4,pacifica,,
+,,5,otro tipo de vivienda,,,,,,,,,,,,,,,,,,,,,,,5,bogota,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,6,san andres,,
