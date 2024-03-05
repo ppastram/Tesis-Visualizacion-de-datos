@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interactive Graph</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        #loading-spinner {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+    <div id="graph"></div>
+    <div id="controls">
+        <div id="dropdowns">
+            <label for="x-axis-dropdown">X-Axis:</label>
+            <select id="x-axis-dropdown"></select>
+            <label for="y-axis-dropdown">Y-Axis:</label>
+            <select id="y-axis-dropdown"></select>
+        </div>
+        <button id="ver-button" disabled>Ver</button>
+    </div>
+        <div id="loading-spinner">Loading...</div>
+
+    <script>
+        fetch('/data')
+            .then(response => response.json())
+            .then(data => {
+                // Hide loading spinner when data is loaded
+                document.getElementById('loading-spinner').style.display = 'none';
+
+                // Populate dropdown menus
+                let columns = Object.keys(data[0]);
+                let xDropdown = document.getElementById('x-axis-dropdown');
+                let yDropdown = document.getElementById('y-axis-dropdown');
+                columns.forEach(col => {
+                    let option = document.createElement('option');
+                    option.text = col;
+                    option.value = col;
+                    xDropdown.add(option);
+                    yDropdown.add(option.cloneNode(true));
+                });
+    
+                // Create Plotly graph function
+                function createGraph() {
+                    let xVariable = document.getElementById('x-axis-dropdown').value;
+                    let yVariable = document.getElementById('y-axis-dropdown').value;
+                    let xData = data.map(row => row[xVariable]);
+                    let yData = data.map(row => row[yVariable]);
+                    let graphDiv = document.getElementById('graph');
+
+                    // Define an array of colors for the bars
+                    let colors = ['blue', 'green', 'red', 'orange', 'purple', 'yellow'];
+
+                    // Create Plotly trace with different colors for each bar
+                    let trace = {
+                        x: xData,
+                        y: yData,
+                        type: 'bar',
+                        // Each bar will have a different color
+                        marker: {
+                            color: colors
+                        }
+                    };
+
+                    // Create Plotly layout
+                    let layout = {
+                        title: `Tiempo dedicado a ${yVariable} según ${xVariable}`,
+                        xaxis: { title: xVariable },
+                        yaxis: { title: `Horas dedicadas a ${yVariable} por día.` }
+                    };
+
+                    // Create Plotly figure
+                    Plotly.newPlot(graphDiv, [trace], layout);
+                }
+
+                // Enable button when both dropdowns have a selection
+                document.getElementById('x-axis-dropdown').addEventListener('change', function() {
+                    document.getElementById('ver-button').disabled = !(this.value && document.getElementById('y-axis-dropdown').value);
+                });
+                document.getElementById('y-axis-dropdown').addEventListener('change', function() {
+                    document.getElementById('ver-button').disabled = !(this.value && document.getElementById('x-axis-dropdown').value);
+                });
+    
+                // Add event listener to button
+                document.getElementById('ver-button').addEventListener('click', createGraph);
+            });
+    </script>
+    
+</body>
+</html>
