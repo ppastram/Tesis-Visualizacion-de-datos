@@ -34,17 +34,28 @@
                 document.getElementById('loading-spinner').style.display = 'none';
 
                 // Populate dropdown menus
-                let columns = Object.keys(data[0]);
+
+                let firstDropdownColumns = ['edad', 'sexo', 'grupoEtnico', 'region', 'urbanoORural', 'estratoTarifa', 'Internet']; 
+                let secondDropdownColumns = ['dormir', 'descansar', 'deporte', 'caminar', 'baresOFiestas', 'conversar', 'internet', 'internetAlgoMas', 'leer', 'instrumento', 'musica', 'musicaAlgoMas', 'aconsejar', 'rezarOMeditar', 'cuidarMascotas', 'cuidarPlantas', 'sembrarConsumo', 'criarOCazar', 'jugarNino', 'cuentosNino', 'parqueNino', 'alcanzaTiempo'];
+
                 let xDropdown = document.getElementById('x-axis-dropdown');
                 let yDropdown = document.getElementById('y-axis-dropdown');
-                columns.forEach(col => {
+
+
+                firstDropdownColumns.forEach(col => {
                     let option = document.createElement('option');
                     option.text = col;
                     option.value = col;
                     xDropdown.add(option);
-                    yDropdown.add(option.cloneNode(true));
                 });
-    
+
+                secondDropdownColumns.forEach(col => {
+                    let option = document.createElement('option');
+                    option.text = col;
+                    option.value = col;
+                    yDropdown.add(option);
+                });
+
                 // Create Plotly graph function
                 function createGraph() {
                     let xVariable = document.getElementById('x-axis-dropdown').value;
@@ -85,11 +96,11 @@
                 document.getElementById('y-axis-dropdown').addEventListener('change', function() {
                     document.getElementById('ver-button').disabled = !(this.value && document.getElementById('x-axis-dropdown').value);
                 });
-    
+
                 // Add event listener to button
                 document.getElementById('ver-button').addEventListener('click', createGraph);
             });
     </script>
-    
+
 </body>
 </html>
