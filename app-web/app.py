@@ -38,18 +38,26 @@ dash_app.layout = html.Div([
 @dash_app.callback(
     Output('graph', 'figure'),
     [Input('x-axis-dropdown', 'value'),
-     Input('y-axis-dropdown', 'value')]
+     Input('y-axis-dropdown', 'value'),
+     Input('chart-type-dropdown', 'value')]
 )
-def update_graph(x_axis_column, y_axis_column):
+def update_graph(x_axis_column, y_axis_column, chart_type):
     # Filter dataframe based on selected columns
     grouped_data = df.groupby(x_axis_column)[y_axis_column].mean().reset_index()
 
-    # Create Plotly trace
-    trace = go.Bar(
-        x=grouped_data[x_axis_column],
-        y=grouped_data[y_axis_column],
-        name=y_axis_column
-    )
+    if chart_type == 'barra':
+        # Create Plotly trace for bar graph
+        trace = go.Bar(
+            x=grouped_data[x_axis_column],
+            y=grouped_data[y_axis_column],
+            name=y_axis_column
+        )
+    elif chart_type == 'torta':
+        # Create Plotly trace for pie chart
+        trace = go.Pie(
+            labels=grouped_data[x_axis_column],
+            values=grouped_data[y_axis_column]
+        )
 
     # Create Plotly layout
     layout = go.Layout(

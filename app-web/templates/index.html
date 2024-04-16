@@ -17,10 +17,12 @@
     <div id="graph"></div>
     <div id="controls">
         <div id="dropdowns">
-            <label for="x-axis-dropdown">X-Axis:</label>
+            <label for="x-axis-dropdown">Eje X:</label>
             <select id="x-axis-dropdown"></select>
-            <label for="y-axis-dropdown">Y-Axis:</label>
+            <label for="y-axis-dropdown">Eje Y:</label>
             <select id="y-axis-dropdown"></select>
+            <label for="chart-type-dropdown">Tipo de gráfica:</label>
+            <select id="chart-type-dropdown"></select>
         </div>
         <button id="ver-button" disabled>Ver</button>
     </div>
@@ -34,13 +36,13 @@
                 document.getElementById('loading-spinner').style.display = 'none';
 
                 // Populate dropdown menus
-
                 let firstDropdownColumns = ['edad', 'sexo', 'grupoEtnico', 'region', 'urbanoORural', 'estratoTarifa', 'Internet']; 
                 let secondDropdownColumns = ['dormir', 'descansar', 'deporte', 'caminar', 'baresOFiestas', 'conversar', 'internet', 'internetAlgoMas', 'leer', 'instrumento', 'musica', 'musicaAlgoMas', 'aconsejar', 'rezarOMeditar', 'cuidarMascotas', 'cuidarPlantas', 'sembrarConsumo', 'criarOCazar', 'jugarNino', 'cuentosNino', 'parqueNino', 'alcanzaTiempo'];
+                let chartTypes = ['Barra', 'Torta'];
 
                 let xDropdown = document.getElementById('x-axis-dropdown');
                 let yDropdown = document.getElementById('y-axis-dropdown');
-
+                let chartTypeDropdown = document.getElementById('chart-type-dropdown');
 
                 firstDropdownColumns.forEach(col => {
                     let option = document.createElement('option');
@@ -56,49 +58,79 @@
                     yDropdown.add(option);
                 });
 
-                // Create Plotly graph function
+                chartTypes.forEach(type => {
+                    let option = document.createElement('option');
+                    option.text = type;
+                    option.value = type.toLowerCase().replace(' ', '-');
+                    chartTypeDropdown.add(option);
+                });
+
+                // Enable button when all three dropdowns have a selection
+                document.getElementById('x-axis-dropdown').addEventListener('change', function() {
+                    enableButton();
+                });
+                document.getElementById('y-axis-dropdown').addEventListener('change', function() {
+                    enableButton();
+                });
+                document.getElementById('chart-type-dropdown').addEventListener('change', function() {
+                    enableButton();
+                });
+
+                function enableButton() {
+                    let xAxisValue = document.getElementById('x-axis-dropdown').value;
+                    let yAxisValue = document.getElementById('y-axis-dropdown').value;
+                    let chartTypeValue = document.getElementById('chart-type-dropdown').value;
+                    document.getElementById('ver-button').disabled = !(xAxisValue && yAxisValue && chartTypeValue);
+                }
+
+                // Add event listener to button
+                document.getElementById('ver-button').addEventListener('click', createGraph);
+
                 function createGraph() {
                     let xVariable = document.getElementById('x-axis-dropdown').value;
                     let yVariable = document.getElementById('y-axis-dropdown').value;
+                    let chartType = document.getElementById('chart-type-dropdown').value;
                     let xData = data.map(row => row[xVariable]);
                     let yData = data.map(row => row[yVariable]);
                     let graphDiv = document.getElementById('graph');
 
-                    // Define an array of colors for the bars
-                    let colors = ['blue', 'green', 'red', 'orange', 'purple', 'yellow'];
+                    if (chartType === 'torta') {
+                        // Create Plotly trace for pie chart
+                        let trace = {
+                            labels: xData,
+                            values: yData,
+                            type: 'pie'
+                        };
 
-                    // Create Plotly trace with different colors for each bar
-                    let trace = {
-                        x: xData,
-                        y: yData,
-                        type: 'bar',
-                        // Each bar will have a different color
-                        marker: {
-                            color: colors
-                        }
-                    };
+                        // Create Plotly layout for pie chart
+                        let layout = {
+                            title: `Tiempo dedicado a ${yVariable} según ${xVariable}`
+                        };
 
-                    // Create Plotly layout
-                    let layout = {
-                        title: `Tiempo dedicado a ${yVariable} según ${xVariable}`,
-                        xaxis: { title: xVariable },
-                        yaxis: { title: `Horas dedicadas a ${yVariable} por día.` }
-                    };
+                        // Create Plotly figure for pie chart
+                        Plotly.newPlot(graphDiv, [trace], layout);
+                    } else if (chartType === 'barra') {
 
-                    // Create Plotly figure
-                    Plotly.newPlot(graphDiv, [trace], layout);
+                        // Create Plotly trace for bar graph
+                        let trace = {
+                            x: xData,
+                            y: yData,
+                            type: 'bar'
+                        };
+
+                        // Create Plotly layout for bar graph
+                        let layout = {
+                            title: `Tiempo dedicado a ${yVariable} según ${xVariable}`,
+                            xaxis: { title: xVariable },
+                            yaxis: { title: `Horas dedicadas a ${yVariable} por día.` }
+                        };
+
+                        // Create Plotly figure for bar graph
+                        Plotly.newPlot(graphDiv, [trace], layout);
+                    }
+                
                 }
 
-                // Enable button when both dropdowns have a selection
-                document.getElementById('x-axis-dropdown').addEventListener('change', function() {
-                    document.getElementById('ver-button').disabled = !(this.value && document.getElementById('y-axis-dropdown').value);
-                });
-                document.getElementById('y-axis-dropdown').addEventListener('change', function() {
-                    document.getElementById('ver-button').disabled = !(this.value && document.getElementById('x-axis-dropdown').value);
-                });
-
-                // Add event listener to button
-                document.getElementById('ver-button').addEventListener('click', createGraph);
             });
     </script>
 
