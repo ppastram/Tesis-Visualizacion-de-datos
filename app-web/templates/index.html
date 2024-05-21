@@ -3,14 +3,9 @@
 <head>
     <title>Interactive Graph</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/processing.js/1.6.6/processing.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <style>
-        #loading-spinner {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
     </style>
 </head>
 <body>
@@ -26,19 +21,17 @@
         </div>
         <button id="ver-button" disabled>Ver</button>
     </div>
-        <div id="loading-spinner">Loading...</div>
+
+    <div id="sketch"></div>
 
     <script>
         fetch('/data')
             .then(response => response.json())
             .then(data => {
-                // Hide loading spinner when data is loaded
-                document.getElementById('loading-spinner').style.display = 'none';
-
                 // Populate dropdown menus
                 let firstDropdownColumns = ['edad', 'sexo', 'grupoEtnico', 'region', 'urbanoORural', 'estratoTarifa', 'Internet']; 
                 let secondDropdownColumns = ['dormir', 'descansar', 'deporte', 'caminar', 'baresOFiestas', 'conversar', 'internet', 'internetAlgoMas', 'leer', 'instrumento', 'musica', 'musicaAlgoMas', 'aconsejar', 'rezarOMeditar', 'cuidarMascotas', 'cuidarPlantas', 'sembrarConsumo', 'criarOCazar', 'jugarNino', 'cuentosNino', 'parqueNino', 'alcanzaTiempo'];
-                let chartTypes = ['Barra', 'Torta'];
+                let chartTypes = ['Barra', 'Torta', 'Pizza'];
 
                 let xDropdown = document.getElementById('x-axis-dropdown');
                 let yDropdown = document.getElementById('y-axis-dropdown');
@@ -65,23 +58,10 @@
                     chartTypeDropdown.add(option);
                 });
 
-                // Enable button when all three dropdowns have a selection
-                document.getElementById('x-axis-dropdown').addEventListener('change', function() {
-                    enableButton();
-                });
-                document.getElementById('y-axis-dropdown').addEventListener('change', function() {
-                    enableButton();
-                });
-                document.getElementById('chart-type-dropdown').addEventListener('change', function() {
-                    enableButton();
-                });
-
-                function enableButton() {
-                    let xAxisValue = document.getElementById('x-axis-dropdown').value;
-                    let yAxisValue = document.getElementById('y-axis-dropdown').value;
-                    let chartTypeValue = document.getElementById('chart-type-dropdown').value;
-                    document.getElementById('ver-button').disabled = !(xAxisValue && yAxisValue && chartTypeValue);
-                }
+                let xAxisValue = document.getElementById('x-axis-dropdown').value;
+                let yAxisValue = document.getElementById('y-axis-dropdown').value;
+                let chartTypeValue = document.getElementById('chart-type-dropdown').value;
+                document.getElementById('ver-button').disabled = !(xAxisValue && yAxisValue && chartTypeValue);
 
                 // Add event listener to button
                 document.getElementById('ver-button').addEventListener('click', createGraph);
@@ -90,6 +70,7 @@
                     let xVariable = document.getElementById('x-axis-dropdown').value;
                     let yVariable = document.getElementById('y-axis-dropdown').value;
                     let chartType = document.getElementById('chart-type-dropdown').value;
+
                     let xData = data.map(row => row[xVariable]);
                     let yData = data.map(row => row[yVariable]);
                     let graphDiv = document.getElementById('graph');
@@ -109,8 +90,8 @@
 
                         // Create Plotly figure for pie chart
                         Plotly.newPlot(graphDiv, [trace], layout);
-                    } else if (chartType === 'barra') {
 
+                    } else if (chartType === 'barra') {
                         // Create Plotly trace for bar graph
                         let trace = {
                             x: xData,
@@ -127,9 +108,17 @@
 
                         // Create Plotly figure for bar graph
                         Plotly.newPlot(graphDiv, [trace], layout);
+
+                    }} /**else if (chartType === 'pizza') {
+                        loadPizzaScript();
                     }
-                
                 }
+
+                function loadPizzaScript() {
+                    let script = document.createElement('script');
+                    script.src = '../../visualizaciones/Visualizacion2d.js';
+                    document.body.appendChild(script);
+                }*/
 
             });
     </script>
