@@ -5,22 +5,12 @@ let fullTurns = 1; // Start with 1 for better understanding and control
 let currentBlueCircle = 0;
 let currentYellowCircle = 0;
 let isAnimating = false;
-let audioContextStarted = false;
-let leerSound, musicaSounds = [];
-let musicaIndex = 0;
 
 
 function preload() {
  customFont = loadFont('./SpaceMono-Regular.ttf');
  titulo = loadFont('./RubikMonoOne-Regular.ttf');
  bold = loadFont('./SpaceMono-Bold.ttf');  // Adjust the path as necessary
- leerSound = loadSound('leer.mp3');  // Load the leer sound
- // Load the música sounds
- musicaSounds.push(loadSound('musica1.wav'));
- musicaSounds.push(loadSound('musica2.wav'));
- musicaSounds.push(loadSound('musica3.wav'));
- musicaSounds.push(loadSound('musica4.wav'));
- musicaSounds.push(loadSound('musica5.wav'));
 }
 
 
@@ -50,26 +40,12 @@ function setup() {
    numYellow: yellowCircles[index]
  }));
 
-
- // Randomize the order of the música sounds initially
- shuffleArray(musicaSounds);
-
-
  drawStaticElements();
  noLoop();
 }
 
 
 function mousePressed() {
- if (!audioContextStarted) {
-   // Attempt to resume the AudioContext on the first interaction
-   getAudioContext().resume().then(() => {
-     console.log('AudioContext resumed successfully!');
-     audioContextStarted = true;
-   });
- }
-
-
  // Toggle the animation state
  if (!isAnimating) {
    loop(); // Start the animation
@@ -118,13 +94,7 @@ function draw() {
 
      // Check if all circles in the current sector are drawn
      if (currentCircle >= totalCirclesInSector) {
-       // Play the sound based on the majority of circles
-       if (sector.numBlue > sector.numYellow) {
-         playSoundForDuration(musicaSounds[musicaIndex], 0.5);
-         musicaIndex = (musicaIndex + 1) % musicaSounds.length;
-       } else {
-         playSoundForDuration(leerSound, 0.5);
-       }
+ 
 
 
        currentSector = (currentSector + 1) % sectors.length;
@@ -136,8 +106,6 @@ function draw() {
        // Increment fullTurns only when all sectors have been processed
        if (currentSector === 0) {
          fullTurns++;
-         // Randomize the order of the música sounds after a full turn is completed
-         shuffleArray(musicaSounds);
        }
      }
    }
@@ -152,25 +120,7 @@ function draw() {
    textSize(80);
    text(`Día:${fullTurns}`, width - 550, height - 40);
  }
-
-
- if (fullTurns % 50 === 0) {
-   displaySpecialMessage(fullTurns);
- }
 }
-
-
-function playSoundForDuration(sound, duration) {
- sound.playMode('restart');
- sound.play();
- setTimeout(() => {
-   sound.stop();
- }, duration * 1000);
-}
-
-
-
-
 
 
 function shuffleArray(array) {
@@ -272,101 +222,3 @@ function drawStaticElements() {
  fill(217, 4, 22);
  circle(60, 1037, 40);
 }
-
-
-function displaySpecialMessage(turnCount) {
- fill(242, 242, 242); // Set the text color
- textSize(25); // Set the text size
- noStroke();
- if (turnCount == 50) {
-   textFont(titulo);
-   let message = `Estrato 1:`;
-   text(message, 40, 200);
-   textFont(customFont);
-   message = `21% de la población`;
-   text(message, 40, 225);
-   message = `10,134,238 personas`;
-   text(message, 40, 250);
- }
-
-
- if (turnCount == 100) {
-   textFont(titulo);
-   let message = `Estrato 2:`;
-   text(message, 40, 340);
-   textFont(customFont);
-   message = `32% de la población`;
-   text(message, 40, 365);
-   message = `15,442,718 personas`;
-   text(message, 40, 390);
- }   // Adjust to appear below the subtitles
-
-
- if (turnCount == 150) {
-   textFont(titulo);
-   let message = `Estrato 3:`;
-   text(message, 40, 480);
-   textFont(customFont);
-   message = `29% de la población`;
-   text(message, 40, 505);
-   message = `13,994,963 personas`;
-   text(message, 40, 530);
- }
-
-
- if (turnCount == 200) {
-   textFont(titulo);
-   let message = `Estrato 4:`;
-   text(message, 40, 620);
-   textFont(customFont);
-   message = `11% de la población`;
-   text(message, 40, 645);
-   message = `5,308,434 personas`;
-   text(message, 40, 670);
- }
- if (turnCount == 250) {
-   textFont(titulo);
-   let message = `Estrato 5 y 6:`;
-   text(message, 40, 760);
-   textFont(customFont);
-   message = `7% de la población`;
-   text(message, 40, 785);
-   message = `3,378,094 personas`;
-   text(message, 40, 810);
- }
-
-
- if (turnCount == 300) {
-   textFont(bold);
-   let message = `Población Colombiana: 48,258,494`;
-   text(message, 40, 915);
- }
-
-
- if (turnCount == 350) {
-   textFont(customFont);
-   message = `51,378,956 días oyendo música al año`;
-   text(message, 40, 275);
-   message = `12,843,739 días leyendo al año`;
-   text(message, 40, 300);
-   message = `78,286,000 días oyendo música al año`;
-   text(message, 40, 415);
-   message = `19,571,500 días leyendo al año`;
-   text(message, 40, 440);
-   message = `70,946,687 días oyendo música al año`;
-   text(message, 40, 555);
-   message = `35,473,343 días leyendo al año`;
-   text(message, 40, 580);
-   message = `26,910,811 días oyendo música al año`;
-   text(message, 40, 695);
-   message = `20,183,108 días leyendo al año`;
-   text(message, 40, 720);
-   message = `17,125,059 días oyendo música al año`;
-   text(message, 40, 835);
-   message = `19,265,692 días leyendo al año`;
-   text(message, 40, 860);
- }
-}
-
-
-
