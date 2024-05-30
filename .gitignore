@@ -1,1 +1,3 @@
 app-web/venv/
+.DS_Store
+app-web/templates/.DS_Store
