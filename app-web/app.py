@@ -1,10 +1,12 @@
+import json
 import dash
 from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output
 import pandas as pd
 import plotly.graph_objs as go
-from flask import Flask, render_template
+from flask import Flask, render_template, request, jsonify
+from flask import send_from_directory
 
 # Initialize Flask application
 app = Flask(__name__)
@@ -12,7 +14,7 @@ app = Flask(__name__)
 # Initialize Dash application
 dash_app = dash.Dash(__name__, server=app, url_base_pathname='/dash/')
 
-# Read data from CSV file
+# Read data from CSV files
 df = pd.read_csv('../data/data_depurada.csv')
 
 # Define Dash layout
@@ -44,6 +46,10 @@ dash_app.layout = html.Div([
 def update_graph(x_axis_column, y_axis_column, chart_type):
     # Filter dataframe based on selected columns
     grouped_data = df.groupby(x_axis_column)[y_axis_column].mean().reset_index()
+    #------REVISAR SI VALORES ESTÁN BIEN AQUÍ
+
+    # Print grouped_data in terminal
+    print(grouped_data)
 
     if chart_type == 'barra':
         # Create Plotly trace for bar graph
@@ -85,6 +91,35 @@ def data():
     data_json = df.to_json(orient='records')
     return data_json
 
+@app.route('/visualizaciones/<path:path>')
+def send_visualizaciones(path):
+    return send_from_directory('../visualizaciones', path)
+
+
+@app.route('/<path:path>')
+def send_fuentes(path):
+    return send_from_directory('.', path)
+
+
+@app.route('/config.json')
+def get_config():
+    config = {
+                "xVariable": "defaultVariable",
+                "yVariable": "defaultVariable",
+                "grupos": ["estrato 1", "estrato 2", "estrato 3", "estrato 4", "estrato 5", "estrato 6"],
+                "percentages": [21, 32, 29, 11, 4, 3],
+                "blueCircles": [4, 4, 4, 4, 4, 4],
+                "promedios": [20, 20, 20, 20, 20]
+            }
+    return jsonify(config)
+
+@app.route('/save-config', methods=['POST'])
+def save_config():
+    config = request.json
+    # Save the config to a file or handle it as needed
+    with open('config.json', 'w') as config_file:
+        json.dump(config, config_file)
+    return jsonify({"status": "success"}), 200
 
 # Run Flask application
 if __name__ == '__main__':

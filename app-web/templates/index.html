@@ -1,37 +1,88 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Interactive Graph</title>
+    <title>Visualizaciones de datos</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/processing.js/1.6.6/processing.min.js"></script>
+    <!-- <script src="visualizaciones/Visualizacion2d.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        #container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        #controls {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1; /* Ensure controls are above other content */
+            background: rgba(255, 255, 255, 0.8); /* Slightly transparent background */
+            padding: 10px;
+            box-sizing: border-box;
+            border-radius: 5px;
+        }
+        #graphCanvas {
+            position: absolute;
+            top: 80px;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 80px);
+            z-index: 0; /* Canvas below controls */
+        }
+        #graph {
+            position: absolute;
+            top: 80px; /* Adjust the top position to leave space for controls */
+            left: 0;
+            width: 70%;
+            height: calc(70% - 80px); /* Adjust height to account for the controls */
+            z-index: 0; /* Graph below controls */
+        }
     </style>
 </head>
+
 <body>
-    <div id="graph"></div>
-    <div id="controls">
-        <div id="dropdowns">
-            <label for="x-axis-dropdown">Eje X:</label>
-            <select id="x-axis-dropdown"></select>
-            <label for="y-axis-dropdown">Eje Y:</label>
-            <select id="y-axis-dropdown"></select>
-            <label for="chart-type-dropdown">Tipo de gráfica:</label>
-            <select id="chart-type-dropdown"></select>
+    <div id="container">
+        <canvas id="graphCanvas"></canvas>
+            <div id="controls">
+                <div id="dropdowns">
+                    <label for="x-axis-dropdown">Clasificar población por:</label>
+                    <select id="x-axis-dropdown"></select>
+                    <label for="y-axis-dropdown">Tiempo que le dedica en promedio una persona a:</label>
+                    <select id="y-axis-dropdown"></select>
+                    <label for="chart-type-dropdown">Tipo de gráfica:</label>
+                    <select id="chart-type-dropdown"></select>
+                </div>
+                <button id="ver-button" disabled>Ver</button>
+            </div>
+            <div id="graph"></div>
+            <div id="sketch"></div>
+            <iframe id="dynamicFrame" style="display: none;"></iframe>
         </div>
-        <button id="ver-button" disabled>Ver</button>
     </div>
-
-    <div id="sketch"></div>
-
+    <main></main>
+    <!--
+    <canvas id="myCanvas" width="1920" height="1080" style="border:1px solid #000000;"></canvas>
+    -->
+    <div>
     <script>
         fetch('/data')
             .then(response => response.json())
             .then(data => {
                 // Populate dropdown menus
-                let firstDropdownColumns = ['edad', 'sexo', 'grupoEtnico', 'region', 'urbanoORural', 'estratoTarifa', 'Internet']; 
-                let secondDropdownColumns = ['dormir', 'descansar', 'deporte', 'caminar', 'baresOFiestas', 'conversar', 'internet', 'internetAlgoMas', 'leer', 'instrumento', 'musica', 'musicaAlgoMas', 'aconsejar', 'rezarOMeditar', 'cuidarMascotas', 'cuidarPlantas', 'sembrarConsumo', 'criarOCazar', 'jugarNino', 'cuentosNino', 'parqueNino', 'alcanzaTiempo'];
-                let chartTypes = ['Barra', 'Torta', 'Pizza'];
+                let firstDropdownColumns = ['Edad', 'Sexo', 'Grupo etnico', 'Region', 'Urbana o rural', 'Estrato', 'Si tiene acceso a internet o no']; 
+                let secondDropdownColumns = ['Dormir', 'Descansar', 'Hacer deporte', 'Caminar', 'Ir a bares o fiestas', 'Conversar', 'Navegar en internet', 
+                'Navegar en internet mientras hace otra actividad', 'Leer', 'Tocar un instrumento musical', 'Escuchar musica',
+                'Escuchar musica mientras hace otra actividad', 'Aconsejar o consolar a alguien', 'Rezar o meditar', 'Cuidar mascotas', 'Cuidar plantas',
+                'Sembrar plantas para el consumo del hogar', 'Criar o cazar animales para el consumo del hogar', 'Jugar con ninos', 'Leerle cuentos a ninos',
+                'Llevar ninos al parque', '¿Le alcanza el tiempo para hacer todas sus actividades?'];
+                let chartTypes = ['Barra', 'Torta', 'Dinamica', '3D'];
 
                 let xDropdown = document.getElementById('x-axis-dropdown');
                 let yDropdown = document.getElementById('y-axis-dropdown');
@@ -40,21 +91,21 @@
                 firstDropdownColumns.forEach(col => {
                     let option = document.createElement('option');
                     option.text = col;
-                    option.value = col;
+                    option.value = col.toLowerCase().replaceAll(' ', '-');
                     xDropdown.add(option);
                 });
 
                 secondDropdownColumns.forEach(col => {
                     let option = document.createElement('option');
                     option.text = col;
-                    option.value = col;
+                    option.value = col.toLowerCase().replaceAll(' ', '-');
                     yDropdown.add(option);
                 });
 
                 chartTypes.forEach(type => {
                     let option = document.createElement('option');
                     option.text = type;
-                    option.value = type.toLowerCase().replace(' ', '-');
+                    option.value = type.toLowerCase();
                     chartTypeDropdown.add(option);
                 });
 
@@ -67,61 +118,395 @@
                 document.getElementById('ver-button').addEventListener('click', createGraph);
 
                 function createGraph() {
+
                     let xVariable = document.getElementById('x-axis-dropdown').value;
                     let yVariable = document.getElementById('y-axis-dropdown').value;
                     let chartType = document.getElementById('chart-type-dropdown').value;
 
                     let xData = data.map(row => row[xVariable]);
                     let yData = data.map(row => row[yVariable]);
+                    let averages = [];
+                    let circulos = [];
+
+                    //hacer que xData
                     let graphDiv = document.getElementById('graph');
 
-                    if (chartType === 'torta') {
-                        // Create Plotly trace for pie chart
-                        let trace = {
-                            labels: xData,
-                            values: yData,
-                            type: 'pie'
-                        };
+                    fetch('/config.json')
+                        .then(response => response.json())
+                        .then(config => {
+                            // Modify values in config.json
+                            config.xVariable = xVariable;
+                            config.yVariable = yVariable;
 
-                        // Create Plotly layout for pie chart
-                        let layout = {
-                            title: `Tiempo dedicado a ${yVariable} según ${xVariable}`
-                        };
+                            if(xVariable == 'edad'){
+                                config.percentages = [0, 3, 12, 22, 45, 15, 3];
 
-                        // Create Plotly figure for pie chart
-                        Plotly.newPlot(graphDiv, [trace], layout);
+                                let totals = [0,0,0,0,0,0,0];
+                                let counts = [0,0,0,0,0,0,0];
+                                let age;
 
-                    } else if (chartType === 'barra') {
-                        // Create Plotly trace for bar graph
-                        let trace = {
-                            x: xData,
-                            y: yData,
-                            type: 'bar'
-                        };
+                                for (let i = 0; i < data.length; i++) {
+                                    age = data[i]['edad'];
 
-                        // Create Plotly layout for bar graph
-                        let layout = {
-                            title: `Tiempo dedicado a ${yVariable} según ${xVariable}`,
-                            xaxis: { title: xVariable },
-                            yaxis: { title: `Horas dedicadas a ${yVariable} por día.` }
-                        };
+                                    if (age === '0-5') {
+                                        totals[0] += data[i][yVariable];
+                                        counts[0]++;
+                                    }
+                                    else if (age === '6-11') {
+                                        totals[1] += data[i][yVariable];
+                                        counts[1]++;
+                                    }
 
-                        // Create Plotly figure for bar graph
-                        Plotly.newPlot(graphDiv, [trace], layout);
+                                    else if (age === '12-18') {
+                                        totals[2] += data[i][yVariable];
+                                        counts[2]++;
+                                    }
 
-                    }} /**else if (chartType === 'pizza') {
-                        loadPizzaScript();
-                    }
+                                    else if (age === '19-30') {
+                                        totals[3] += data[i][yVariable];
+                                        counts[3]++;
+                                    }
+
+                                    else if (age === '31-60') {
+                                        totals[4] += data[i][yVariable];
+                                        counts[4]++;
+                                    }
+
+                                    else if (age === '61-80') {
+                                        totals[5] += data[i][yVariable];
+                                        counts[5]++;
+                                    }
+
+                                    else if (age === '81+') {
+                                        totals[6] += data[i][yVariable];
+                                        counts[6]++;
+                                    }
+                                    
+                                }
+
+                                averages.push(totals[0] / counts[0]);
+                                averages.push(totals[1] / counts[1]);
+                                averages.push(totals[2] / counts[2]);
+                                averages.push(totals[3] / counts[3]);
+                                averages.push(totals[4] / counts[4]);
+                                averages.push(totals[5] / counts[5]);
+                                averages.push(totals[6] / counts[6]);
+
+                                config.grupos = ['0-5 años', '6-11 años', '12-18 años', '19-30 años', '31-60 años', '61-80 años', '81+ años'];
+                            }
+                            else if(xVariable == 'sexo'){
+                                config.percentages = [53, 47];
+
+                                let sexo;
+                                let totals = [0,0];
+                                let counts = [0,0];
+
+                                for (let i = 0; i < data.length; i++) {
+                                    sexo = data[i]['sexo'];
+
+                                    if (sexo === 'mujer') {
+                                        totals[0] += data[i][yVariable];
+                                        counts[0]++;
+                                    }
+                                    else if (sexo === 'hombre') {
+                                        totals[1] += data[i][yVariable];
+                                        counts[1]++;
+                                    }
+                                    
+                                }
+
+                                averages.push(totals[0] / counts[0]);
+                                averages.push(totals[1] / counts[1]);
+
+                                config.grupos = ['mujeres', 'hombres'];
+                            }
+                            else if(xVariable == 'grupo-etnico'){
+                                config.percentages = [83, 7, 4, 3, 2, 1]
+
+                                let totals = [0,0,0,0,0,0];
+                                let counts = [0,0,0,0,0,0];
+                                let etnia;
+
+                                for (let i = 0; i < data.length; i++) {
+                                    etnia = data[i]['grupo-etnico'];
+
+                                    if (etnia === 'ninguna de las anteriores') {
+                                        totals[0] += data[i][yVariable];
+                                        counts[0]++;
+                                    }
+                                    else if (etnia === 'negro/a, afro') {
+                                        totals[1] += data[i][yVariable];
+                                        counts[1]++;
+                                    }
+                                    else if (etnia === 'indigena') {
+                                        totals[2] += data[i][yVariable];
+                                        counts[2]++;
+                                    }
+                                    else if (etnia === 'raizal del archipielago') {
+                                        totals[3] += data[i][yVariable];
+                                        counts[3]++;
+                                    }
+                                    else if (etnia === 'palenquero de san basilio') {
+                                        totals[4] += data[i][yVariable];
+                                        counts[4]++;
+                                    }
+                                    else if (etnia === 'gitano/a, rom') {
+                                        totals[5] += data[i][yVariable];
+                                        counts[5]++;
+                                    }
+                                    
+                                }
+
+                                averages.push(totals[0] / counts[0]);
+                                averages.push(totals[1] / counts[1]);
+                                averages.push(totals[2] / counts[2]);
+                                averages.push(totals[3] / counts[3]);
+                                averages.push(totals[4] / counts[4]);
+                                averages.push(totals[5] / counts[5]);
+
+                                config.grupos = ['ninguna de las anteriores', 'negro/a, afro', 'indigena', 'raizal del archipielago', 'palenquero de san basilio', 'gitano/a, rom'];
+                            }
+                            else if(xVariable == 'region'){
+                                config.percentages = [24, 23, 18, 16, 16, 3];
+                                
+                                let totals = [0,0,0,0,0,0];
+                                let counts = [0,0,0,0,0,0];
+                                let region;
+
+                                for (let i = 0; i < data.length; i++) {
+                                    region = data[i]['region'];
+
+                                    if (region === 'central') {
+                                        totals[0] += data[i][yVariable];
+                                        counts[0]++;
+                                    }
+                                    else if (region === 'caribe') {
+                                        totals[1] += data[i][yVariable];
+                                        counts[1]++;
+                                    }
+                                    else if (region === 'oriental') {
+                                        totals[2] += data[i][yVariable];
+                                        counts[2]++;
+                                    }
+                                    else if (region === 'pacifica') {
+                                        totals[3] += data[i][yVariable];
+                                        counts[3]++;
+                                    }
+                                    else if (region === 'bogota') {
+                                        totals[4] += data[i][yVariable];
+                                        counts[4]++;
+                                    }
+                                    else if (region === 'san andres') {
+                                        totals[5] += data[i][yVariable];
+                                        counts[5]++;
+                                    }
+                                    
+                                }
+
+                                averages.push(totals[0] / counts[0]);
+                                averages.push(totals[1] / counts[1]);
+                                averages.push(totals[2] / counts[2]);
+                                averages.push(totals[3] / counts[3]);
+                                averages.push(totals[4] / counts[4]);
+                                averages.push(totals[5] / counts[5]);
+
+                                config.grupos = ['región central', 'región caribe', 'región oriental', 'región pacífica', 'Bogotá', 'San Andrés y Providencia'];
+                            }
+                            else if(xVariable == 'urbana-o-rural'){
+                                config.percentages = [80, 20];
+
+                                let totals = [0,0];
+                                let counts = [0,0];
+                                let zona;
+                                
+                                for (let i = 0; i < data.length; i++) {
+                                    zona = data[i]['urbana-o-rural'];
+
+                                    if (zona === 'urbano') {
+                                        totals[0] += data[i][yVariable];
+                                        counts[0]++;
+                                    }
+                                    else if (zona === 'rural') {
+                                        totals[1] += data[i][yVariable];
+                                        counts[1]++;
+                                    }
+                                }
+
+                                averages.push(totals[0] / counts[0]);
+                                averages.push(totals[1] / counts[1]);
+
+                                config.grupos = ['zona rural', 'zona urbana'];
+                            }
+                            else if(xVariable == 'estrato'){
+                                config.percentages = [38, 33, 19, 5, 3, 2];
+
+                                let totals = [0,0,0,0,0,0];
+                                let counts = [0,0,0,0,0,0];
+                                let estrato;
+
+                                for (let i = 0; i < data.length; i++) {
+                                    estrato = data[i]['estrato'];
+
+                                    if (estrato === '1') {
+                                        totals[0] += data[i][yVariable];
+                                        counts[0]++;
+                                    }
+                                    else if (estrato === '2') {
+                                        totals[1] += data[i][yVariable];
+                                        counts[1]++;
+                                    }
+                                    else if (estrato === '3') {
+                                        totals[2] += data[i][yVariable];
+                                        counts[2]++;
+                                    }
+                                    else if (estrato === '4') {
+                                        totals[3] += data[i][yVariable];
+                                        counts[3]++;
+                                    }
+                                    else if (estrato === '5') {
+                                        totals[4] += data[i][yVariable];
+                                        counts[4]++;
+                                    }
+                                    else if (estrato === '6') {
+                                        totals[5] += data[i][yVariable];
+                                        counts[5]++;
+                                    }
+                                    
+                                }
+
+                                averages.push(totals[0] / counts[0]);
+                                averages.push(totals[1] / counts[1]);
+                                averages.push(totals[2] / counts[2]);
+                                averages.push(totals[3] / counts[3]);
+                                averages.push(totals[4] / counts[4]);
+                                averages.push(totals[5] / counts[5]);
+
+                                config.grupos = ['estrato 1', 'estrato 2', 'estrato 3', 'estrato 4', 'estrato 5', 'estrato 6'];
+                            }
+                            else if(xVariable == 'si-tiene-acceso-a-internet-o-no'){
+                                config.percentages = [69, 31];
+
+                                let totals = [0,0];
+                                let counts = [0,0];
+                                let acceso;
+
+                                for (let i = 0; i < data.length; i++) {
+                                    acceso = data[i]['si-tiene-acceso-a-internet-o-no'];
+
+                                    if (acceso === 'si') {
+                                        totals[0] += data[i][yVariable];
+                                        counts[0]++;
+                                    }
+                                    else if (acceso === 'no') {
+                                        totals[1] += data[i][yVariable];
+                                        counts[1]++;
+                                    }
+                                }
+
+                                averages.push(totals[0] / counts[0]);
+                                averages.push(totals[1] / counts[1]);
+
+                                config.grupos = ['tiene acceso a internet', 'no tiene acceso a internet'];
+                            }
+
+                            config.promedios = averages;
+                            circulos = averages.slice(); // create a copy of averages
+
+                            for (let i = 0; i < circulos.length; i++) {
+                                circulos[i] = averages[i];
+                                circulos[i] = Math.round(circulos[i] * 12);
+                            }
+                            config.blueCircles = circulos;
+                                                        
+                            // Save modified config.json
+                            fetch('/save-config', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(config)
+                            })
+                            .then(response => {
+                                if (response.ok) {
+                                    console.log('Config file saved successfully');
+                                    // console.log(config.xVariable);
+                                    // console.log(config.yVariable);
+                                    // console.log(config.blueCircles);
+                                    // console.log(config.promedios);
+                                } else {
+                                    console.error('Failed to save config file');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error saving config file:', error);
+                            });
+
+                        if (chartType === 'torta') {
+                            // Create Plotly trace for pie chart
+                            console.log(config.xVariable);
+                            console.log(config.yVariable);
+                            console.log(config.grupos);
+                            console.log(config.promedios);
+
+                            let trace = {
+                                labels: config.grupos,
+                                values: config.promedios,
+                                type: 'pie'
+                            };
+
+                            // Create Plotly layout for pie chart
+                            let layout = {
+                                title: `Tiempo dedicado a ${yVariable.replaceAll('-', ' ')} según ${xVariable.replaceAll('-', ' ')}`
+                            };
+
+                            // Create Plotly figure for pie chart
+                            Plotly.newPlot(graphDiv, [trace], layout);
+
+                        } else if (chartType === 'barra') {
+                            // Create Plotly trace for bar graph
+                            let trace = {
+                                x: config.grupos,
+                                y: config.promedios,
+                                type: 'bar'
+                            };
+
+                            // Create Plotly layout for bar graph
+                            let layout = {
+                                title: `Tiempo dedicado a ${yVariable.replaceAll('-', ' ')} según ${xVariable.replaceAll('-', ' ')}`,
+                                xaxis: { title: xVariable.replaceAll('-', ' ')},
+                                yaxis: { title: `Horas dedicadas a ${yVariable.replaceAll('-', ' ')} por día.` }
+                            };
+
+                            // Create Plotly figure for bar graph
+                            Plotly.newPlot(graphDiv, [trace], layout);
+
+                        } 
+                        
+                        else if (chartType === 'dinamica') {
+                            let dynamicFrame = document.getElementById('dynamicFrame');
+                            dynamicFrame.style.display = 'block';
+                            dynamicFrame.src = 'visualizaciones/Visualizacion2d.js';
+                        }
+
+                        else if (chartType === '3d') {
+                            load3dScript();
+                        }
+
+                        //Forma temporal de llamar visualización dinámica --- REVISAR
+                        function loadDynamicScript() {
+                            let script = document.createElement('script');
+                            script.src = './visualizaciones/Visualizacion2d.js';
+                            document.body.appendChild(script);
+                        }
+
+                        function load3dScript() {
+                        }
+                    });
+
                 }
-
-                function loadPizzaScript() {
-                    let script = document.createElement('script');
-                    script.src = '../../visualizaciones/Visualizacion2d.js';
-                    document.body.appendChild(script);
-                }*/
-
+            
             });
-    </script>
-
-</body>
+        </script>
+        </div>
+    </body>
 </html>
