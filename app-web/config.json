@@ -1,1 +1,1 @@
-{"blueCircles": [2, 2], "grupos": ["mujeres", "hombres"], "percentages": [53, 47], "promedios": [0.12858699715045643, 0.13868153215229378], "xVariable": "sexo", "yVariable": "caminar"}
+{"blueCircles": [4, 5], "grupos": ["mujeres", "hombres"], "percentages": [53, 47], "promedios": [0.32250134708083505, 0.377064204951075], "xVariable": "sexo", "yVariable": "escuchar-musica"}
