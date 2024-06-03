@@ -442,12 +442,10 @@
 
                         if (chartType === 'torta') {
                             dynamicFrame.style.display = 'none';
-                            
+
                             // Create Plotly trace for pie chart
                             console.log(config.xVariable);
                             console.log(config.yVariable);
-                            console.log(config.grupos);
-                            console.log(config.promedios);
 
                             let trace = {
                                 labels: config.grupos,
@@ -488,7 +486,7 @@
                         else if (chartType === 'dinamica') {
                             // Delete previous plotly-generated graphs
                             Plotly.purge(graphDiv);
-                            
+
                             dynamicFrame.style.display = 'block';
                             dynamicFrame.src = '../../visualizaciones/visualizacionCaller.html';
                             dynamicFrame.style.width = '155%';

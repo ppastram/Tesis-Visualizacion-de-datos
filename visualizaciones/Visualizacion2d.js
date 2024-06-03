@@ -10,13 +10,19 @@ function preload() {
     customFont = loadFont('./SpaceMono-Regular.ttf');
     titulo = loadFont('./RubikMonoOne-Regular.ttf');
     bold = loadFont('./SpaceMono-Bold.ttf');
-    config = loadJSON('./config.json');
+
+    config = loadJSON('../config.json', (data) => {
+        console.log("Config loaded successfully:", data);
+    }, (error) => {
+        console.error("Error loading config.json:", error);
+    });
 }
 
 function setup() {
     createCanvas(2250, 1080);
     background(13, 13, 13);
     textSize(40);
+
     let angles = [0]; // Start with an initial angle of 0
     let percentages = config.percentages; // Percentages for each sector
     let blueCircles = config.blueCircles; // Number of blue circles per sector
@@ -175,11 +181,11 @@ function drawStaticElements() {
     textSize(45);
     textFont(titulo);
     text(`Tiempo dedicado a`, 38, 125);
-    text(`${config.yVariable}`, 38, 225);
-    text(`por ${config.xVariable}`, 38, 325);
+    text(`${config.yVariable.replaceAll('-', ' ')}`, 38, 225);
+    text(`por ${config.xVariable.replaceAll('-', ' ')}`, 38, 325);
     textSize(35);
     textFont(customFont);
-    text(`5 minutos dedicados a ${config.yVariable}`, 90, 980);
+    text(`5 minutos dedicados a ${config.yVariable.replaceAll('-', ' ')}`, 90, 980);
     fill(4, 178, 217);
     circle(60, 967, 40);
     fill(242, 242, 242);

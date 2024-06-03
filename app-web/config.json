@@ -1,1 +1,1 @@
-{"blueCircles": [1, 1], "grupos": ["tiene acceso a internet", "no tiene acceso a internet"], "percentages": [69, 31], "promedios": [0.07715794821214782, 0.05003445957300563], "xVariable": "si-tiene-acceso-a-internet-o-no", "yVariable": "cuidar-mascotas"}
+{"blueCircles": [2, 2], "grupos": ["mujeres", "hombres"], "percentages": [53, 47], "promedios": [0.12858699715045643, 0.13868153215229378], "xVariable": "sexo", "yVariable": "caminar"}

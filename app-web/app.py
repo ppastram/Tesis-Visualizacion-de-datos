@@ -101,18 +101,6 @@ def send_fuentes(path):
     return send_from_directory('.', path)
 
 
-@app.route('/config.json')
-def get_config():
-    config = {
-                "xVariable": "defaultVariable",
-                "yVariable": "defaultVariable",
-                "grupos": ["estrato 1", "estrato 2", "estrato 3", "estrato 4", "estrato 5", "estrato 6"],
-                "percentages": [21, 32, 29, 11, 4, 3],
-                "blueCircles": [4, 4, 4, 4, 4, 4],
-                "promedios": [20, 20, 20, 20, 20]
-            }
-    return jsonify(config)
-
 @app.route('/save-config', methods=['POST'])
 def save_config():
     config = request.json
