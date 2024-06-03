@@ -63,7 +63,7 @@
             </div>
             <div id="graph"></div>
             <div id="sketch"></div>
-            <iframe id="dynamicFrame" style="display: none;"></iframe>
+            <iframe id="dynamicFrame" width="100%" height="80%" top="80" style="display: none;"></iframe>
         </div>
     </div>
     <main></main>
@@ -122,6 +122,7 @@
                     let xVariable = document.getElementById('x-axis-dropdown').value;
                     let yVariable = document.getElementById('y-axis-dropdown').value;
                     let chartType = document.getElementById('chart-type-dropdown').value;
+                    let dynamicFrame = document.getElementById('dynamicFrame');
 
                     let xData = data.map(row => row[xVariable]);
                     let yData = data.map(row => row[yVariable]);
@@ -429,8 +430,6 @@
                             .then(response => {
                                 if (response.ok) {
                                     console.log('Config file saved successfully');
-                                    // console.log(config.xVariable);
-                                    // console.log(config.yVariable);
                                     // console.log(config.blueCircles);
                                     // console.log(config.promedios);
                                 } else {
@@ -442,6 +441,8 @@
                             });
 
                         if (chartType === 'torta') {
+                            dynamicFrame.style.display = 'none';
+                            
                             // Create Plotly trace for pie chart
                             console.log(config.xVariable);
                             console.log(config.yVariable);
@@ -463,6 +464,8 @@
                             Plotly.newPlot(graphDiv, [trace], layout);
 
                         } else if (chartType === 'barra') {
+                            dynamicFrame.style.display = 'none';
+
                             // Create Plotly trace for bar graph
                             let trace = {
                                 x: config.grupos,
@@ -483,24 +486,25 @@
                         } 
                         
                         else if (chartType === 'dinamica') {
-                            let dynamicFrame = document.getElementById('dynamicFrame');
+                            // Delete previous plotly-generated graphs
+                            Plotly.purge(graphDiv);
+                            
                             dynamicFrame.style.display = 'block';
-                            dynamicFrame.src = 'visualizaciones/Visualizacion2d.js';
+                            dynamicFrame.src = '../../visualizaciones/visualizacionCaller.html';
+                            dynamicFrame.style.width = '155%';
+                            dynamicFrame.style.height = '140%';
+                            dynamicFrame.style.top = '-30%';
+                            dynamicFrame.style.left = '-45%';
+                            dynamicFrame.style.position = 'absolute';
+                            dynamicFrame.style.zIndex = '0';
+                            dynamicFrame.style.transform = 'scale(0.4)';
                         }
 
                         else if (chartType === '3d') {
-                            load3dScript();
+                            Plotly.purge(graphDiv);
+                            dynamicFrame.style.display = 'none';
                         }
 
-                        //Forma temporal de llamar visualización dinámica --- REVISAR
-                        function loadDynamicScript() {
-                            let script = document.createElement('script');
-                            script.src = './visualizaciones/Visualizacion2d.js';
-                            document.body.appendChild(script);
-                        }
-
-                        function load3dScript() {
-                        }
                     });
 
                 }

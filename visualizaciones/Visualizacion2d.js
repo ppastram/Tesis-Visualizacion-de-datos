@@ -7,10 +7,10 @@ let isAnimating = false;
 let titles = []; // Initialize titles array
 
 function preload() {
-    customFont = loadFont('./visualizaciones/SpaceMono-Regular.ttf');
-    titulo = loadFont('./visualizaciones/RubikMonoOne-Regular.ttf');
-    bold = loadFont('./visualizaciones/SpaceMono-Bold.ttf');
-    config = loadJSON('./visualizaciones/config.json');
+    customFont = loadFont('./SpaceMono-Regular.ttf');
+    titulo = loadFont('./RubikMonoOne-Regular.ttf');
+    bold = loadFont('./SpaceMono-Bold.ttf');
+    config = loadJSON('./config.json');
 }
 
 function setup() {
@@ -37,17 +37,7 @@ function setup() {
     }));
 
     drawStaticElements();
-    noLoop();
-}
-
-function mousePressed() {
-    // Toggle the animation state
-    if (!isAnimating) {
-        loop(); // Start the animation
-    } else {
-        noLoop(); // Pause the animation
-    }
-    isAnimating = !isAnimating;
+    loop();
 }
 
 function draw() {
