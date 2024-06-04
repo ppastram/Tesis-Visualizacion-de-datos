@@ -17,6 +17,8 @@ dash_app = dash.Dash(__name__, server=app, url_base_pathname='/dash/')
 # Read data from CSV files
 df = pd.read_csv('../data/data_depurada.csv')
 
+votes = {"yes": 0, "no": 0}
+
 # Define Dash layout
 dash_app.layout = html.Div([
     dcc.Graph(id='graph'),
@@ -108,6 +110,20 @@ def save_config():
     with open('config.json', 'w') as config_file:
         json.dump(config, config_file)
     return jsonify({"status": "success"}), 200
+
+@app.route('/vote', methods=['POST'])
+def vote():
+    global votes
+    data = request.json
+    if data['vote'] == 'yes':
+        votes['yes'] += 1
+    elif data['vote'] == 'no':
+        votes['no'] += 1
+    return jsonify(votes)
+
+@app.route('/results', methods=['GET'])
+def results():
+    return jsonify(votes)
 
 # Run Flask application
 if __name__ == '__main__':

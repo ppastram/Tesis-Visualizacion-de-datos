@@ -1,1 +1,1 @@
-{"blueCircles": [2, 2], "grupos": ["mujeres", "hombres"], "percentages": [53, 47], "promedios": [0.12858699715045643, 0.13868153215229378], "xVariable": "sexo", "yVariable": "caminar"}
+{"blueCircles": [95, 98], "grupos": ["tiene acceso a internet", "no tiene acceso a internet"], "percentages": [69, 31], "promedios": [7.930654566700526, 8.19037743568759], "xVariable": "si-tiene-acceso-a-internet-o-no", "yVariable": "dormir"}
