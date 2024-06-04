@@ -83,6 +83,7 @@ function draw(){
             text(`${config.grupos[currentIndex]}`, 0, 0);
         }
         text(`Tiempo dedicado a ${config.yVariable.replaceAll('-', ' ')}`, 0, -500);
+        text(`Haga click para oír la visualización`, 0, 500);
     } else {
         fill(255, 0, 0);
         textFont('Arial');
