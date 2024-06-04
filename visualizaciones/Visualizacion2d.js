@@ -145,7 +145,7 @@ function drawStaticElements() {
     circle(1340, 540, 900);
 
     if (titles && titles.length > 0) {
-        textSize(17);
+        textSize(30);
         fill(242, 242, 242);
 
         sectors.forEach((sector, index) => {
