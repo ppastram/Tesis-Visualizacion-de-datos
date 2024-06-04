@@ -1,21 +1,45 @@
-let sueno;
 let trabajo;
 let fft;
 let playing = false;
 let currentSound = 'none';
+let currentIndex = 0; // Track the current index in trabajoTimes
+let configLoaded = false;
 
-let trabajoTimes = [3000, 2000, 4000, 1000, 5000, 3000, 2000]; // Define 7 values of time for trabajo in milliseconds
-let suenoTimes = [8000, 6000, 7000, 5000, 9000, 4000, 8000]; // Define 7 values of time for sueno in milliseconds
+let trabajoTimes = []; // Initialize as an empty array
+let config = {}; // Initialize config object
+let yVariableFile = ''; // Store the filename for the yVariable
 
 function preload(){
-    trabajo = loadSound('./trabajo.mp3');
-    sueno = loadSound('./sueno.mp3');
+    customFont = loadFont('./SpaceMono-Regular.ttf');
+    titulo = loadFont('./RubikMonoOne-Regular.ttf');
+    bold = loadFont('./SpaceMono-Bold.ttf');
+
+    config = loadJSON('../config.json', (data) => {
+        console.log("Config loaded successfully:", data);
+        // Populate trabajoTimes with "promedios" multiplied by 1000
+        trabajoTimes = data.promedios.map(p => p * 1000);
+        config = data;
+        yVariableFile = `./${data.yVariable}.mp3`; // Set the filename based on yVariable
+        trabajo = loadSound(yVariableFile, () => {
+            console.log(`${yVariableFile} loaded successfully`);
+            configLoaded = true; // Mark config as loaded only after the sound is loaded
+        }, (error) => {
+            console.error(`Error loading ${yVariableFile}:`, error);
+        });
+        console.log("trabajoTimes:", trabajoTimes);
+        console.log("config:", config);
+    }, (error) => {
+        console.error("Error loading config.json:", error);
+    });
 }
 
 function setup(){
     createCanvas(windowWidth, windowHeight);
     angleMode(DEGREES);
     fft = new p5.FFT();
+    // Add event listener to resume AudioContext on user gesture
+    getAudioContext().suspend();
+    userStartAudio();
 }
 
 function draw(){
@@ -23,8 +47,6 @@ function draw(){
     strokeWeight(5);
     if (currentSound === 'trabajo') {
         stroke('#D90416'); // Red when trabajo is playing
-    } else if (currentSound === 'sueno') {
-        stroke('#04B2D9'); // Blue when sueno is playing
     } else {
         stroke(255); // White when nothing is playing
     }
@@ -48,6 +70,24 @@ function draw(){
         }
         endShape();
     }
+
+    // Check if config is loaded before displaying the title
+    if (configLoaded) {
+        console.log("Displaying titles");
+        fill(242, 242, 242);
+        noStroke();
+        textFont(titulo);
+        textSize(40);
+        textAlign(CENTER, CENTER);
+        if (playing && currentIndex < config.grupos.length) {
+            text(`${config.grupos[currentIndex]}`, 0, 0);
+        }
+        text(`Tiempo dedicado a ${config.yVariable.replaceAll('-', ' ')}`, 0, -500);
+    } else {
+        fill(255, 0, 0);
+        textFont('Arial');
+        text("Loading config...", width / 2, height / 2);
+    }
 }
 
 function mouseClicked() {
@@ -62,6 +102,7 @@ function playSequence() {
 }
 
 function playNext(index) {
+    currentIndex = index; // Update the current index
     if (index < trabajoTimes.length) {
         currentSound = 'trabajo';
         trabajo.play();
@@ -69,16 +110,8 @@ function playNext(index) {
             trabajo.pause();
             currentSound = 'none';
             setTimeout(() => {
-                currentSound = 'sueno';
-                sueno.play();
-                setTimeout(() => {
-                    sueno.pause();
-                    currentSound = 'none';
-                    setTimeout(() => {
-                        playNext(index + 1); // Play next pair of times
-                    }, 1000); // Pause for 1 second between blue to red
-                }, suenoTimes[index]);
-            }, 1000); // Pause for 1 second between red to blue
+                playNext(index + 1); // Play next time
+            }, 1000); // Pause for 1 second between plays
         }, trabajoTimes[index]);
     } else {
         playing = false; // End of sequence
