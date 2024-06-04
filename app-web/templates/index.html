@@ -55,7 +55,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="javascript:void(0)" onclick="openTab(event,  'Sobre el proyecto')">Sobre el proyecto</a>
+                    <a class="nav-link" href="javascript:void(0)" onclick="openTab(event, 'Sobre el proyecto')">Sobre el proyecto</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="javascript:void(0)" onclick="openTab(event, 'Visualizacion')">Visualización</a>
@@ -111,7 +111,7 @@
                     <p>Para la construcción de esta herramienta, se descargó la base de datos abierta del ENUT 2021 disponible en la página del DANE. Estos datos fueron procesados usando Python y bibliotecas como Pandas, Matplotlib y Seaborn. Posteriormente, las gráficas fueron creadas usando Plotly, Processing (P5) y Blender. Por último, esta página web a través de la cual los usuarios pueden interactuar con los datos fue creada utilizando Flask.</p>
                 </div>
                 <div class="col-md-6">
-                    <img src="foto.png" alt="ENUT" class="img-fluid">
+                    <img src="../images/foto_encuesta.jpg" alt="ENUT" class="img-fluid">
                 </div>
             </div>
         
@@ -119,11 +119,31 @@
         
 
         <div id="Sobre las visualizaciones" class="tabcontent">
-            <h1>Tab 2 Content</h1>
-            <p>Content for Tab 2 goes here.</p>
+            <h2>Creando nuevas visualizaciones</h2>
+            <div class="container mt-4">
+                <div class="row text-image-block">
+                    <div class="col-md-6">
+                        <h4>Visualización dinámica</h4>
+                        <p>Para la primera de las visualizaciones, se realizó una animación. Esto se entiende para el proyecto como una visualización de datos 2D en donde el tiempo juega un rol fundamental en el desarrollo de la visualización. Así, el tiempo se vuelve un recurso más para hacer sentir al observador el paso del tiempo. Adicionalmente se usa un año como la totalidad de la animación para evidenciar como las actividades que realizamos diariamente se acumulan a lo largo del tiempo.</p>
+                    </div>
+                    <div class="col-md-6">
+                        <img src="../images/dinamica.png" class="img-fluid" alt="Image 1">
+                    </div>
+                </div>
+                <div class="row text-image-block">
+                    <div class="col-md-6 order-md-2">
+                        <h4>Visualización sonora</h4>
+                        <p>La visualización auditiva aprovecha las diferencias sonoras de las diferentes actividades para crear paisajes sonoros que evidencien los datos. La duración de cada sonido representa el tiempo dedicado a cada una de las actividades. El sonido escogido apunta directamente al contexto de cada una de las actividades. De esta manera se genera una visualización que requiere de la atención del usuario: este debe ser consciente de la duración de cada sonido. Esta interacción fomenta una relación más personal y bilateral con los datos.</p>
+                    </div>
+                    <div class="col-md-6 order-md-1">
+                        <img src="../images/sonora.png" class="img-fluid" alt="Image 2">
+                    </div>
+                </div>
+            </div>
         </div>
         
         <div id="Le alcanza el tiempo" class="tabcontent">
+
             <div class="row">
                 <div class="col-md-6">
                     <h3>A todos nos alcanza (o no) el tiempo igual</h3>
@@ -139,27 +159,45 @@
                             <li data-target="#imageCarousel" data-slide-to="0" class="active"></li>
                             <li data-target="#imageCarousel" data-slide-to="1"></li>
                             <li data-target="#imageCarousel" data-slide-to="2"></li>
+                            <li data-target="#imageCarousel" data-slide-to="3"></li>
+                            <li data-target="#imageCarousel" data-slide-to="4"></li>
+                            <li data-target="#imageCarousel" data-slide-to="5"></li>
+                            <li data-target="#imageCarousel" data-slide-to="6"></li>
                         </ol>
                         <div class="carousel-inner">
                             <div class="carousel-item active">
-                                <img src="image1.jpg" class="d-block w-100" alt="Image 1">
+                                <img src="../images/estrato.png" class="d-block w-100" alt="Image 1">
                                 <div class="carousel-caption d-none d-md-block">
-                                    <h5>Image 1</h5>
-                                    <p>Caption for image 1.</p>
                                 </div>
                             </div>
                             <div class="carousel-item">
-                                <img src="image2.jpg" class="d-block w-100" alt="Image 2">
+                                <img src="../images/sexo.png" class="d-block w-100" alt="Image 2">
                                 <div class="carousel-caption d-none d-md-block">
-                                    <h5>Image 2</h5>
-                                    <p>Caption for image 2.</p>
                                 </div>
                             </div>
                             <div class="carousel-item">
-                                <img src="image3.jpg" class="d-block w-100" alt="Image 3">
+                                <img src="../images/etnia.png" class="d-block w-100" alt="Image 3">
                                 <div class="carousel-caption d-none d-md-block">
-                                    <h5>Image 3</h5>
-                                    <p>Caption for image 3.</p>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="../images/urbana.png" class="d-block w-100" alt="Image 4">
+                                <div class="carousel-caption d-none d-md-block">
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="../images/internet.png" class="d-block w-100" alt="Image 5">
+                                <div class="carousel-caption d-none d-md-block">
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="../images/edad.png" class="d-block w-100" alt="Image 6">
+                                <div class="carousel-caption d-none d-md-block">
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="../images/region.png" class="d-block w-100" alt="Image 7">
+                                <div class="carousel-caption d-none d-md-block">
                                 </div>
                             </div>
                         </div>
@@ -171,12 +209,12 @@
                             <span class="carousel-control-next-icon" aria-hidden="true"></span>
                             <span class="sr-only">Next</span>
                         </a>
+                    </div>
                 </div>
-                </div>
-            </div>
+             </div>
         </div>
-
     </div>
+
 
     <main></main>
 
